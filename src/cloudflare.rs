@@ -65,7 +65,7 @@ impl Client {
             .call()
             .map_err(Box::new)?;
 
-        Ok(response.into_string()?)
+        Ok(response.into_string()?.trim_end().into())
     }
 
     #[allow(clippy::result_large_err)]
