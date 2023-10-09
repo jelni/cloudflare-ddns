@@ -27,14 +27,33 @@ fn main() {
             Err(cloudflare::Error::Request(err))
                 if matches!(err.kind(), ErrorKind::ConnectionFailed) =>
             {
-                println!("{protocol} not available");
+                println!("{protocol} address not available");
                 continue;
             }
             response => response.unwrap(),
         };
 
+        if record.content == ip {
+            println!(
+                "record {} already has the address {}",
+                record.id, record.content
+            );
+            continue;
+        }
+
         client
-            .update_dns_record(&zone_id, record_id, InputDnsRecord { content: ip })
+            .update_dns_record(
+                &record.zone_id,
+                &record.id,
+                InputDnsRecord {
+                    content: ip.clone(),
+                },
+            )
             .unwrap();
+
+        println!(
+            "updated record {} address from {} to {ip}",
+            record.id, record.content
+        );
     }
 }
